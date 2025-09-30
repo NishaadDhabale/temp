@@ -3,13 +3,15 @@ import { Filter, Search, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ProjectCard from './ProjectCard';
 
-export default function AdminDashboard() {
+// Receive onApproveProject as a prop
+export default function AdminDashboard({ onApproveProject }) {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isProcessing, setIsProcessing] = useState(null); // To disable buttons during tx
 
   useEffect(() => {
     fetchProjects();
@@ -50,7 +52,7 @@ export default function AdminDashboard() {
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       filtered = filtered.filter(p =>
-        p.project_id.toLowerCase().includes(search) ||
+        p.project_id.toString().includes(search) ||
         p.project_name.toLowerCase().includes(search) ||
         p.organization_name.toLowerCase().includes(search)
       );
@@ -59,52 +61,35 @@ export default function AdminDashboard() {
     setFilteredProjects(filtered);
   };
 
-  const handleApprove = async (id) => {
-    try {
-      const { error } = await supabase
-        .from('projects')
-        .update({
-          status: 'approved',
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: 'NCCR Admin'
-        })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setProjects(prev => prev.map(p =>
-        p.id === id
-          ? { ...p, status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: 'NCCR Admin' }
-          : p
-      ));
-    } catch (err) {
-      console.error('Error approving project:', err);
-      alert('Failed to approve project. Please try again.');
-    }
+  const handleApprove = async (project) => {
+      setIsProcessing(project.id);
+      const success = await onApproveProject(project);
+      if(success) {
+          fetchProjects(); // Re-fetch projects to update the UI
+      }
+      setIsProcessing(null);
   };
 
   const handleReject = async (id) => {
+    setIsProcessing(id);
     try {
       const { error } = await supabase
         .from('projects')
         .update({
           status: 'rejected',
           reviewed_at: new Date().toISOString(),
-          reviewed_by: 'NCCR Admin'
+          reviewed_by: 'NCCR Admin (Off-chain)'
         })
         .eq('id', id);
 
       if (error) throw error;
+      fetchProjects();
 
-      setProjects(prev => prev.map(p =>
-        p.id === id
-          ? { ...p, status: 'rejected', reviewed_at: new Date().toISOString(), reviewed_by: 'NCCR Admin' }
-          : p
-      ));
     } catch (err) {
       console.error('Error rejecting project:', err);
       alert('Failed to reject project. Please try again.');
     }
+    setIsProcessing(null);
   };
 
   const stats = {
@@ -114,9 +99,9 @@ export default function AdminDashboard() {
     rejected: projects.filter(p => p.status === 'rejected').length,
   };
 
-  if (loading) {
+  if (loading && projects.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading projects...</p>
@@ -126,8 +111,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Project Approval Dashboard</h2>
           <p className="text-gray-600">Review and approve blue carbon restoration projects</p>
@@ -198,13 +182,13 @@ export default function AdminDashboard() {
               <ProjectCard
                 key={project.id}
                 project={project}
-                onApprove={handleApprove}
-                onReject={handleReject}
+                onApprove={() => handleApprove(project)} // Pass the whole project object
+                onReject={() => handleReject(project.id)}
+                isProcessing={isProcessing === project.id}
               />
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { CheckCircle, XCircle, Clock, MapPin, Building2, Leaf } from 'lucide-react';
 
-export default function ProjectCard({ project, onApprove, onReject }) {
+export default function ProjectCard({ project, onApprove, onReject, isProcessing }) {
   const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     approved: 'bg-green-100 text-green-800 border-green-300',
@@ -72,15 +72,21 @@ export default function ProjectCard({ project, onApprove, onReject }) {
       {project.status === 'pending' && (
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex space-x-3">
           <button
-            onClick={() => onApprove(project.id)}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+            onClick={() => onApprove(project)}
+            disabled={isProcessing}
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 disabled:bg-green-300 disabled:cursor-not-allowed"
           >
-            <CheckCircle className="w-4 h-4" />
-            <span>Approve</span>
+            {isProcessing ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            ) : (
+                <CheckCircle className="w-4 h-4" />
+            )}
+            <span>{isProcessing ? 'Processing...' : 'Approve'}</span>
           </button>
           <button
             onClick={() => onReject(project.id)}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+            disabled={isProcessing}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 disabled:bg-red-300 disabled:cursor-not-allowed"
           >
             <XCircle className="w-4 h-4" />
             <span>Reject</span>
