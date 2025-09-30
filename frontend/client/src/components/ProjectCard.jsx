@@ -1,10 +1,6 @@
-import { useState } from 'react';
 import { CheckCircle, XCircle, Clock, MapPin, Building2, Leaf } from 'lucide-react';
 
 export default function ProjectCard({ project, onApprove, onReject }) {
-  // State to manage the number of credits to mint for this specific card
-  const [creditsToMint, setCreditsToMint] = useState(project.estimated_carbon_credits || 100);
-
   const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
     approved: 'bg-green-100 text-green-800 border-green-300',
@@ -52,7 +48,7 @@ export default function ProjectCard({ project, onApprove, onReject }) {
             <p className="text-lg font-bold text-blue-900">{project.area_hectares} ha</p>
           </div>
           <div className="bg-green-50 p-3 rounded-lg">
-            <p className="text-xs text-green-600 font-medium">Est. Carbon Credits</p>
+            <p className="text-xs text-green-600 font-medium">Carbon Credits</p>
             <p className="text-lg font-bold text-green-900">{project.estimated_carbon_credits.toLocaleString()}</p>
           </div>
         </div>
@@ -74,33 +70,21 @@ export default function ProjectCard({ project, onApprove, onReject }) {
       </div>
 
       {project.status === 'pending' && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 space-y-3">
-          <div>
-            <label htmlFor={`credits-${project.id}`} className="text-xs font-medium text-gray-600">Credits to Mint:</label>
-            <input
-              id={`credits-${project.id}`}
-              type="number"
-              value={creditsToMint}
-              onChange={(e) => setCreditsToMint(e.target.value)}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <div className="flex space-x-3">
-            <button
-              onClick={() => onApprove(project.projectId, creditsToMint)}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
-            >
-              <CheckCircle className="w-4 h-4" />
-              <span>Approve</span>
-            </button>
-            <button
-              onClick={() => onReject(project.id)}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
-            >
-              <XCircle className="w-4 h-4" />
-              <span>Reject</span>
-            </button>
-          </div>
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex space-x-3">
+          <button
+            onClick={() => onApprove(project.id)}
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+          >
+            <CheckCircle className="w-4 h-4" />
+            <span>Approve</span>
+          </button>
+          <button
+            onClick={() => onReject(project.id)}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+          >
+            <XCircle className="w-4 h-4" />
+            <span>Reject</span>
+          </button>
         </div>
       )}
 
