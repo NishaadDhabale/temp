@@ -38,10 +38,13 @@ export default function Landing() {
               <div className="p-2 bg-gradient-to-r from-blue-500 to-teal-600 rounded-lg">
                 <Waves className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">BlueCarbon MRV</span>
+              <span className="text-xl font-bold text-gray-900">Oxyver MRV</span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
+
+              <a href="/marketplace" className="text-gray-700 hover:text-blue-600 transition-colors">MarketPlace</a>
+
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors">Features</a>
               <a href="#solution" className="text-gray-700 hover:text-blue-600 transition-colors">Solution</a>
               <a href="#stakeholders" className="text-gray-700 hover:text-blue-600 transition-colors">Stakeholders</a>
@@ -506,7 +509,7 @@ export default function Landing() {
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-teal-600 rounded-lg">
                   <Waves className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xl font-bold">BlueCarbon MRV</span>
+                <span className="text-xl font-bold">Oxyver MRV</span>
               </div>
               <p className="text-gray-400 mb-4">
                 Revolutionizing coastal ecosystem restoration through blockchain technology.
